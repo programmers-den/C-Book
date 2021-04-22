@@ -26,10 +26,10 @@
 % Disable default indentation an add paragraph spacing
 \usepackage[parfill]{parskip}
 
-\graphicspath{{images/}}
+\graphicspath{{images/} {../images}}
 
-\include{definitions/000-plain-page-header-fix}
-\include{definitions/001-center-page}
+\input{definitions/000-plain-page-header-fix}
+\input{definitions/001-center-page}
 
 \usepackage[cmintegrals,cmbraces]{newtxmath}
 \usepackage{ebgaramond-maths}
@@ -51,10 +51,10 @@
     \setcounter{page}{0}
     
     % Cover
-    \includepdf[pages=-]{cover}
+    \includepdf[pages=-]{images/cover}
     
     % Front sections 
-    \subfile{chapters/0.0-forward}
+    \subfile{chapters/0.0-foreword}
     \subfile{chapters/0.1-copyright}
     
     % Create table of contents
