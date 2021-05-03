@@ -1,0 +1,28 @@
+\usepackage{listings}
+\usepackage{xcolor}
+
+\definecolor{lst_frameborder}{rgb}{0.75, 0.75, 0.75}
+\definecolor{lst_linenumbers}{rgb}{.5, .5, .5}
+\definecolor{lst_codecomment}{rgb}{0, .8, .1}
+\definecolor{lst_codekeyword}{rgb}{.5, .35, .05}
+\definecolor{lst_codestrings}{rgb}{.8, 0, 0}
+\definecolor{lst_codeidentif}{rgb}{0, .2, .6}
+
+\lstset{
+	basicstyle=\ttfamily\footnotesize,
+	breaklines=true,
+	numbers=left,
+	numbersep=5pt,
+	numberstyle=\ttfamily\footnotesize\color{lst_linenumbers},
+	rulecolor=\color{lst_frameborder},
+	tabsize=4,
+	language=C,
+	showspaces=false,
+	showstringspaces=false,
+	showtabs=false,
+	frame=single,
+	commentstyle    = \color{lst_codecomment},
+	keywordstyle    = \color{lst_codekeyword},
+	stringstyle     = \color{lst_codestrings},
+	identifierstyle = \color{lst_codeidentif}
+}

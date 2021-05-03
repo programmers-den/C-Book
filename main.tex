@@ -10,6 +10,7 @@
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage[toc,page]{appendix}
 
 % Removes boxes from links
 \usepackage[
@@ -30,6 +31,7 @@
 
 \input{definitions/000-plain-page-header-fix}
 \input{definitions/001-center-page}
+\input{definitions/002-listing-format}
 
 \usepackage[cmintegrals,cmbraces]{newtxmath}
 \usepackage{ebgaramond-maths}
@@ -37,7 +39,7 @@
 
 \usepackage{subfiles}
 
-\title{PDen OS Book - C - Zero To Hero}
+\title{C: Zero To Hero - Programmer's Den Open Book Initiative}
 \author{Tyler Dence, et. al.}
 \date{April 2021}
 
@@ -68,5 +70,11 @@
 % Chapters
 \mainmatter
     \subfile{chapters/1.0-introduction}
+    \subfile{chapters/2.0-getting-started}
+
+% Appendices
+\appendix
+	\subfile{chapters/A.0-setting-up}
+	\subfile{chapters/B.0-dont-try-this-at-home}
 
 \end{document}
