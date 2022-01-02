@@ -1,0 +1,6 @@
+\pgfkeys{/obi/fig/.is family, /obi/fig,
+  default/.style = {caption=test}, % Initialize so 'defaults' exist
+  caption/.store in = \figcaption,   % Any value assigned to foo will be stored in \foo
+}
+
+\newenvironment{obifig}[1]{\pgfkeys{/obi/fig/.cd, default, #1}\begin{figure}[H]\centering\vspace{1em}}{\caption{\figcaption}\end{figure}}

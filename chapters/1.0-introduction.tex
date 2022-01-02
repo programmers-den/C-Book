@@ -1,11 +1,394 @@
 \documentclass[../main.tex]{subfiles}
 
+% Flowchart Symbols
+%\usetikzlibrary{shapes.geometric, arrows}
+
 \begin{document}
 \chapter{Thinking Like a C Programmer}
-\lipsum[1-5]
-\section{Test}
-\lipsum[1-5]
-\section{Test 2}
-\lipsum[1-5]
+
+\vspace{0.2cm}
+\begin{center}
+	\textit{
+		The good news about computers is that they do what you tell them to do.\\
+		The bad news is that they do what you tell them to do.
+	}\\\vspace{0.5cm}
+	Ted Nelson
+\end{center}
+\vspace{0.75cm}
+
+\section{Understanding the Computer}
+A computer, in essence, is a system that can take some input data, do some math,
+remember the result, and recall the results later. The precise origin of the data
+does not particularly matter - The data might come from memory, user input,
+the Internet, a sensor, or some other source.
+
+There are many different models to aid in understanding how a computer program works,
+but the most effective is a simple flowchart model that will be expanded upon later.
+
+\begin{obifig}{caption=A computer doing work}
+	\begin{tikzpicture}
+		\node[io]      (input)  at (0, 0) {Input};
+		\node[process] (prog)   at (5, 0) {Computer};
+		\node[io]      (output) at (10, 0) {Output};
+		
+		\draw[thick,->] (input) -- (prog);
+		\draw[thick,->] (prog)  -- (output);
+		\draw[thick]    (prog.north) arc (0:90:0.5) -- (3.3, 1) arc (90:270:0.5) (prog.west);
+	\end{tikzpicture}
+\end{obifig}
+
+A computer can be modeled as a black box that does processing on a data stream,
+as shown above, but what is it that the computer actually \textit{does}? And why does
+the flowchart loop back on itself in the \textit{Computer} stage? The answer to both of these questions can be found by investigating State Machines.
+
+\subsection{The State Machine}
+The State Machine is a model that allows introspection into what the computer is
+actually doing. In it, a computer program is segmented into multiple, discrete
+states. These states have conditions, that if met, will trigger the system to perform
+an action and move to a different state.
+
+Examining a simple example will help illustrate how these transitions work.
+Consider a basic vending machine, only selling one product. It has two basic states:
+(1) accepting payment and
+(2) product selection.
+
+The start state is also marked, as otherwise the machine starting state is left
+undefined. Undefined behavior is a Bad Thing\texttrademark, and leads to
+potentially unexpected outcomes, such as the vending machine starting in the
+\textit{Select Product} state. Such a machine could be exploited by would-be
+thieves by simply unplugging the machine and plugging it back in!
+
+\begin{obifig}{caption=A Basic State Machine}
+	\begin{tikzpicture}
+		\node[state,fill=red!30] (start) at (0, 2) {Start};
+		\node[state] (pay)     at (0, 0) {Accepting \\ Payment};
+		\node[state] (disp)    at (7, 0) {Select \\ Product};
+		
+		\draw[thick, ->] (start) -- (pay);
+		
+		\draw[thick, ->] (pay) edge[above, bend left=15]
+			node {Insert Currency} (disp);
+		\draw[thick, ->] (disp) edge[below, bend left=15]
+			node {Product Selected} (pay);
+		
+		\draw[thick, ->] (pay) edge[loop left,align=center,looseness=4]
+			node {Product\\Selected} (pay);
+		\draw[thick, ->] (disp) edge[loop right,align=center,looseness=4]
+			node {Insert\\Currency} (disp);
+
+	\end{tikzpicture}
+\end{obifig}
+
+In the \textit{Accepting Payment} state, the machine sits and waits for the customer
+to insert payment. Any time one of the sensors determines that payment has been made,
+the machine transitions to the \textit{Select Product} state. While in the
+\textit{Select Product} state, the machine waits for the customer to select a product,
+dispenses a product and transitions back to the \textit{Accepting Payment} state.
+
+If the machine is waiting for one type of input, it ignores/rejects another type of
+input. For example, in the \textit{Accepting Payment} state, the machine ignores
+any action the customer takes to select a product. Similarly, when in the
+\textit{Select Product} state, the machine rejects any inserted currency.
+
+A state machine like the one presented above is also known as a Finite State Machine,
+as the number states is finite. These state machines can also be described in a table
+called a state-transition table.
+
+\begin{obitab}{size=\small, cols=|l|l|l|l|,
+	caption=Vending Machine State Transition Table}
+
+	\hline
+	\rowcolor{black}
+		\othead{Current State}
+		& \othead{Input}
+		& \othead{Next State}
+		& \othead{Action} \\
+	\hline
+	
+	\multirow{2}{*}{Accepting Payment}
+		& Insert Currency & Select Product & Allows user to select a product\\
+		\cline{2-4}
+		& Product Selected & Accepting Payment & Does Nothing \\
+	\hline
+	
+	\multirow{2}{*}{Select Product}
+		& Insert Currency & Select Product & Does Nothing \\
+		\cline{2-4}
+		& Product Selected & Accepting Payment & Dispenses the selected product\\
+	\hline
+\end{obitab}
+
+The design of such state machines can grow quite
+complex, however, as any information the machine needs to store must be a unique
+state. To demonstrate, imagine if the machine needed to keep track of different
+denominations of currency or make change.
+
+\section{Problem Solving}
+\subsection{Programming or Software Engineering}
+There are entire books written on the subject of project management and problem 
+solving with much more depth than can be described here. For a deep dive into the
+theory and methodology of solving problems, there are many resources available: video 
+lecture series, articles, blog posts, books, and others. As such, the overall goal
+here is not to dive into an expert-level description of the problem solving process.
+The purpose here is to explore the mindset and thought process of a programmer
+approaching a problem.
+
+Many will draw a distinction between a programmer and a software engineer; the sole 
+role of a programmer is to write code, while a software engineer manages the process 
+of architecture and design. This is a false dichotomy, however. Programmers, i.e. 
+people who write code, are necessarily involved in the problem solving process and
+need to make design decisions as they solve the problem at hand. This is especially the case for hobbyists and those on single-person teams.
+
+Every stage of writing code, from the first line to the last, by its nature involves
+making design decisions. Should the code be unit tested? How will this module be
+structured? What language should be used? How will the problem be broken down?
+
+While it is true that "correctness" is something that can be specified, and that 
+there are some problems that are so simple as to elicit the same approach by two 
+different programmers, any problem complex enough as to be interesting will require 
+answering these questions and many more. Just as in many other fields, there is not 
+usually one correct approach to solving the problem at hand. Some design approaches 
+might be faster to run; some might be easier to implement, or perhaps easier to 
+maintain. But consciously or not, an approach was chosen and a design decision made.
+
+\subsection{The Problem Solving Process}
+In a general sense, it is the role of the programmer to solve a problem with code.
+The problem could be a contrived one, such as "this process runs 5\% too slow;" an
+end-user goal, such as "listen to music without an Internet connection;"
+an analysis of some kind, such as "run a simulation model and compare results with
+measured data;" or some other useful action.
+
+The first step is to identify the problem that is needing solving. Part of this 
+identification involves a thorough definition of the problem (i.e. the Problem 
+Statement). An unfortunate reality of most problem statements is that they are often
+overly broad. Users, management, and even other programmers often do not understand 
+the complexity involved in developing a program, and so, underestimate the cost of
+adding additional features. This is especially true if they lack specific domain
+knowledge.
+
+For example, consider the problem statement "the answer to life, the
+universe and everything". Where would modeling this problem even begin? As stated, 
+the problem is quite broad, and would pose significant difficulty in implementation.
+Working to narrow the problem down to necessary items only might reveal that the
+actual problem the user needs solving is to perform basic math, i.e. a four-function 
+calculator: "multiply, divide, add or subtract two numbers; then display the result."
+
+Once the problem is identified and clearly stated, the problem is simplified further 
+into multiple, smaller sub-problems. Each of these can be solved independently, then 
+put together to solve the original problem. These sub-problems can often be further
+broken down into smaller and smaller problems.
+
+\begin{obifig}{caption=The Problem Solving Process}
+	\begin{tikzpicture}
+		\node[io]      (pstatement)   at (0, 10) {Problem Statement};
+		
+		\node[process] (sproblem1)    at (-5, 8) {Sub Problem 1};
+		\node[process] (sproblem2)    at (2, 8)  {Sub Problem 2};
+		
+		
+		\node[process] (sproblem3) at (0, 6)     {Sub Problem 3};
+		\node[process] (sproblem4) at (5, 6)     {Sub Problem 4};
+		
+		\node[process] (sproblemsol1) at (-5, 4) {Solved Sub Problem 1};
+		\node[process] (sproblemsol3) at (0, 4)  {Solved Sub Problem 3};
+		\node[process] (sproblemsol4) at (5, 4)  {Solved Sub Problem 4};
+		
+		\node[io]      (solved)       at (0, 2)  {Solution};
+		
+		\node[startstop] (solution)   at (0, 0)  {Solved Problem};
+		
+		\draw[thick,->] (pstatement) -- (sproblem1);
+		\draw[thick,->] (pstatement) -- (sproblem2);
+		
+		\draw[thick,->] (sproblem2) -- (sproblem3);
+		\draw[thick,->] (sproblem2) -- (sproblem4);
+		
+		\draw[thick,->] (sproblem1) -- (sproblemsol1);
+		\draw[thick,->] (sproblem3) -- (sproblemsol3);
+		\draw[thick,->] (sproblem4) -- (sproblemsol4);
+		
+		
+		\draw[thick,->] (sproblemsol1) -- (solved);
+		\draw[thick,->] (sproblemsol3) -- (solved);
+		\draw[thick,->] (sproblemsol4) -- (solved);
+		
+		\draw[thick,->] (solved) -- (solution);
+	\end{tikzpicture}
+\end{obifig}
+
+\subsection{A Sample Problem}
+To demonstrate how the process works, consider the calculator example mentioned in
+previous section. The user wants to be able to take two numbers, and either multiply,
+divide, add, or subtract them. That is the problem statement, already complete!
+
+Next step - simplify the problem into smaller, sub-problems. The way the problem is
+stated already lends itself nicely to how this might be split:
+\begin{itemize}
+	\item Multiplying two numbers
+	\item Dividing two numbers
+	\item Adding two numbers
+	\item Subtracting two numbers
+\end{itemize}
+
+Assume, for a moment that each of these sub-problems are solved. How might the 
+process of taking each of these solutions and composing it into the overall problem
+solution be completed? The answer to this question should serve as a check to ensure
+all parts of the problem have been modeled. If a solution cannot be formed from
+the sub-solutions, there is likely a hidden sub-problem that remains to be explored.
+
+To model this solution, a flowchart will be created. This shows both the order of
+operations within the system, as well as how data flows from one solution to another. Given the solutions to the sub-problems mentioned as building blocks, a calculator program may now be modeled.
+
+\begin{obifig}{caption=Sample Problem Modeling}
+	\begin{tikzpicture}
+		\node[process] (process)   at (0, 3) {Calculate Data};
+
+		\node[process] (subp1)   at (-6, 0) {Multiply $A \times B$};
+		\node[process] (subp2)   at (-2.1, 0) {Divide $A \div B$};
+		\node[process] (subp3)   at (1.8, 0) {Add $A + B$};
+		\node[process] (subp4)   at (5.7, 0) {Subtract $A - B$};
+		
+		\draw[thin, opacity=0.75] ([xshift=-.4cm,yshift=.4cm]subp1.west) --
+			([xshift=-.4cm,yshift=1cm]subp1.west) --
+			([xshift=.4cm,yshift=1cm]subp4.east) --
+			([xshift=.4cm,yshift=.4cm]subp4.east);
+			
+		\draw[thin, opacity=0.75] ([xshift=-.4cm,yshift=-.4cm]process.west) --
+			([xshift=-.4cm,yshift=-1cm]process.west) --
+			([xshift=.4cm,yshift=-1cm]process.east) --
+			([xshift=.4cm,yshift=-.4cm]process.east);
+			
+		\draw[thick,->] ([yshift=-.7cm]process.south) -- ([yshift=-1.3cm]process.south);
+		
+		\draw[thin, opacity=0.75] ([xshift=-.4cm,yshift=-.4cm]subp1.west) --
+			([xshift=-.4cm,yshift=-1cm]subp1.west) --
+			([xshift=.4cm,yshift=-1cm]subp4.east) --
+			([xshift=.4cm,yshift=-.4cm]subp4.east);		
+			
+		\node[startstop] (start) at (-6, -3.5) {Start};
+		\node[io]        (getA)  at (-6, -5.5) {?};
+		
+		\node[decision]  (whichOp) at (0, -3.5) {Op?};
+		
+		\node[process] (opMul)   at (5.8, -3.5)  {Multiply $A \times B$};
+		\node[process] (opDiv)   at (3.9, -4.75)  {Divide $A \div B$};
+		\node[process] (opAdd)   at (2.4, -6)   {Add $A + B$};
+		\node[process] (opSub)   at (2, -7.5)   {Subtract $A - B$};
+		
+		\node[startstop] (end)   at (5.8, -7.5) {Solution};
+
+		\draw[thick,->] (start) -- (getA);
+		
+		\draw[thick,->,dotted] (getA) -- (whichOp);
+		
+		\draw[thick,->] (whichOp) -- (opMul);
+		\draw[thick,->] (whichOp) -- (opDiv);
+		\draw[thick,->] (whichOp) -- (opAdd);
+		\draw[thick,->] (whichOp) -- (opSub.155);
+		
+		\draw[thick,->] (opMul) -- (end);
+		\draw[thick,->] (opDiv) -- (end);
+		\draw[thick,->] (opAdd) -- (end);
+		\draw[thick,->] (opSub) -- (end);
+		
+		\draw[thin, opacity=0.75] ([xshift=-.4cm,yshift=.4cm]start.west) --
+			([xshift=-.4cm,yshift=1cm]start.west) --
+			([xshift=.4cm,yshift=1cm]opMul.east) --
+			([xshift=.4cm,yshift=.4cm]opMul.east);
+			
+		\draw[thick,->] (0, -1.3) -- (0, -2.3); 
+
+	\end{tikzpicture}
+\end{obifig}
+
+
+Oh, no! An impasse has been encountered! Several important pieces have been left off.
+How will the program know which operation the user wanted to perform? How will it
+determine the two numbers ($A$ and $B$) that it should use as its operands? To fully 
+solve this problem, the program will also need to solve these sub-problems as well.
+
+\begin{itemize}
+	\item Accepting a number from the user
+	\item Accepting an operation from the user
+\end{itemize}
+
+With these additions to the set of sub-problems and solutions, a complete flowchart
+can be created:
+
+\begin{obifig}{caption=Sample Problem Modeling - Full Solution}
+	\begin{tikzpicture}
+%		\node[process] (process) at (0, 9)   {Calculate Data};
+%		
+%		\draw[thin, opacity=0.75] ([xshift=-.4cm,yshift=-.4cm]process.west) --
+%			([xshift=-.4cm,yshift=-1cm]process.west) --
+%			([xshift=.4cm,yshift=-1cm]process.east) --
+%			([xshift=.4cm,yshift=-.4cm]process.east);
+%			
+%	
+%		
+%		\node[process] (subp1)   at (-6, 6)  {Multiply $A \times B$};
+%		\node[process] (subp2)   at (-2, 6)  {Divide $A \div B$};
+%		\node[process] (subp3)   at (2, 6)   {Add $A + B$};
+%		\node[process] (subp4)   at (6, 6)   {Subtract $A - B$};
+%		
+%		\node[process] (subp5)   at (-3, 4.5) {Get a Number};
+%		\node[process] (subp6)   at (3, 4.5)  {Get an Operation};
+%		
+%		\draw[thin, opacity=0.75] ([xshift=-.4cm,yshift=.4cm]subp1.west) --
+%			([xshift=-.4cm,yshift=1cm]subp1.west) --
+%			([xshift=.4cm,yshift=1cm]subp4.east) --
+%			([xshift=.4cm,yshift=.4cm]subp4.east);
+%			
+%		\draw[thick,->] ([yshift=-.7cm]process.south) --  ([yshift=-1.3cm]process.south);	
+%		
+%		\draw[thin, opacity=0.75] ([xshift=-.4cm,yshift=-1.9cm]subp1.west) --
+%			([xshift=-.4cm,yshift=-2.5cm]subp1.west) --
+%			([xshift=.4cm,yshift=-2.5cm]subp4.east) --
+%			([xshift=.4cm,yshift=-1.9cm]subp4.east);
+%
+%		
+		\node[startstop] (start) at (-6, 1) {Start};
+		\node[io]        (getA)  at (-6, -1) {Get a Number (A)};
+		\node[io]        (getB)  at (-6, -3) {Get a Number (B)};
+		\node[io]        (getOp) at (-2, -1) {Get an Operation};
+		
+		\node[decision]  (whichOp) at (0, 1) {Op?};
+		
+		\node[process] (opMul)   at (6, 1)  {Multiply $A \times B$};
+		\node[process] (opDiv)   at (4, -.25)  {Divide $A \div B$};
+		\node[process] (opAdd)   at (2.5, -1.5)   {Add $A + B$};
+		\node[process] (opSub)   at (2, -3)   {Subtract $A - B$};
+		
+		\node[startstop] (end)   at (6, -3) {Solution};
+
+		\draw[thick,->] (start) -- (getA);
+		\draw[thick,->] (getA) -- (getB);
+		\draw[thick,->] (getB) -- (getOp.200);
+		
+		\draw[thick,->] (getOp.120) -- (whichOp);
+		
+		\draw[thick,->] (whichOp) -- (opMul);
+		\draw[thick,->] (whichOp) -- (opDiv);
+		\draw[thick,->] (whichOp) -- (opAdd);
+		\draw[thick,->] (whichOp) -- (opSub.155);
+		
+		\draw[thick,->] (opMul) -- (end);
+		\draw[thick,->] (opDiv) -- (end);
+		\draw[thick,->] (opAdd) -- (end);
+		\draw[thick,->] (opSub) -- (end);
+		
+%		\draw[thin, opacity=0.75] ([xshift=-.4cm,yshift=.4cm]start.west) --
+%			([xshift=-.4cm,yshift=1cm]start.west) --
+%			([xshift=.4cm,yshift=1cm]opMul.east) --
+%			([xshift=.4cm,yshift=.4cm]opMul.east);
+%			
+%		\draw[thick,->] (0, 3.2) -- (0, 2.2); 
+	\end{tikzpicture}
+\end{obifig}
+
+\subsection{}
+
+\section{Programming Without Code}
+
 
 \end{document}

@@ -1,8 +1,14 @@
-\documentclass[12pt]{book}
-\usepackage[a4paper, portrait, inner=2cm, outer=3cm, top=2.5cm, bottom=2.5cm]{geometry}
+\documentclass[14pt,table]{extbook}
+\usepackage[
+%	showframe,
+	a4paper, portrait, inner=3cm, outer=2cm, top=2.5cm, bottom=2.5cm]{geometry}
 
+\setlength{\headheight}{17.0pt}
+
+\usepackage{subfiles}
 \usepackage{tikz}
 \usepackage{lipsum}
+\usepackage{float}
 \usepackage{graphics}
 \usepackage{pdfpages}
 \usepackage{fancyhdr}
@@ -10,7 +16,14 @@
 \usepackage{multicol}
 \usepackage{multirow}
 \usepackage{tabularx}
+\usepackage{makecell}
+\usepackage{microtype}
+\usepackage{cellspace}
+\usepackage{xcolor}
+\usepackage[font={small,it}]{caption}
 \usepackage[toc,page]{appendix}
+
+\renewcommand\theadfont{\bfseries}
 
 % Removes boxes from links
 \usepackage[
@@ -32,12 +45,13 @@
 \input{definitions/000-plain-page-header-fix}
 \input{definitions/001-center-page}
 \input{definitions/002-listing-format}
+\input{definitions/003-flowchart}
+\input{definitions/004-figure}
+\input{definitions/005-tables}
 
 \usepackage[cmintegrals,cmbraces]{newtxmath}
 \usepackage{ebgaramond-maths}
 \usepackage[T1]{fontenc}
-
-\usepackage{subfiles}
 
 \title{C: Zero To Hero - Programmer's Den Open Book Initiative}
 \author{Tyler Dence, et. al.}
@@ -52,6 +66,10 @@
     % which puts the first content at page 1.
     \setcounter{page}{0}
     
+    % Set section depth to -1
+    % Disables numbering on sections in the front matter
+    \setcounter{secnumdepth}{-1}
+    
     % Cover
     \includepdf[pages=-]{images/cover}
     
@@ -64,17 +82,80 @@
     
     % Fix header bug where "CONTENTS"
     % shows up in header of blank page
+    % Note: bug only occurs if TOC takes
+    % an odd number of pages to render
     \clearpage
     \markboth{}{}
 
+
+    % Set section depth to 3
+    % Re-enables section numbering
+    \setcounter{secnumdepth}{3}
+
 % Chapters
 \mainmatter
-    \subfile{chapters/1.0-introduction}
-    \subfile{chapters/2.0-getting-started}
+	\part{The Basics}
+		\subfile{chapters/1.0-introduction}
+		\subfile{chapters/2.0-getting-started}
+
+		\chapter{Control Structures}
+			\section{Conditional Statements}
+			\section{Loops}
+				\subsection{While}
+				\subsection{For}
+				\subsection{Do-While}
+
+		\chapter{Functions}
+			\section{Method Signature}
+			\section{Return Values}
+
+		\chapter{Operators}
+			\section{Arithmetic Operators}
+			\section{Bitwise Operators}
+			\section{Logical Operators}
+			\section{Pointer Operators}
+			\section{Operator Precedence (Order of Operations)}
+
+		\chapter{C Type System}
+			\section{Numerical Types}
+				\subsection{Integers}
+				\subsection{Floats}
+
+			\section{Fixed-Width Data Types}
+
+			\section{Textual Types}
+				\subsection{Char}
+				\subsection{Strings}
+
+			\section{Custom Types}
+				\subsection{Structs}
+				\subsection{Unions}
+
+		\chapter{Pointers}
+			\section{Data Pointers}
+			\section{Function Pointers}
+
+	    \chapter{Memory Management}
+	        \section{The Stack}
+	        \section{The Heap}
+
+	    \chapter{Data Structures}
+	        \section{Arrays}
+	        \section{Linked Lists}
+	        \section{Vectors}
+
+		\chapter{File I/O}
+			\section{Reading Files}
+			\section{Writing Files}
 
 % Appendices
 \appendix
 	\subfile{chapters/A.0-setting-up}
 	\subfile{chapters/B.0-dont-try-this-at-home}
+	
+	\chapter{Quick References}
+		\section{Operator Table}
+		\section{Data Types and Sizes}
+		\section{Useful Constants}
 
 \end{document}

@@ -1,0 +1,44 @@
+\pgfkeys{/obi/tab/.is family, /obi/tab,
+  default/.style = {caption=test,size=\normalsize,cols=l},
+  caption/.store in = \figcaption,
+  cols/.store in = \obicols,
+  size/.store in = \obitblsize
+}
+
+%% SNIPPET BEGIN
+% Code courtesy of https://tex.stackexchange.com/a/14460/118294
+\makeatletter
+\newcolumntype{\expand}{}
+\long\@namedef{NC@rewrite@\string\expand}{\expandafter\NC@find}
+\makeatother
+%% END SNIPPET
+
+\newenvironment{obitab}[1]{
+	\pgfkeys{/obi/tab/.cd, default, #1}
+	\vspace{1em}
+	\setlength{\tabcolsep}{0.5em}
+	\begin{table}[H]
+	\obitblsize
+	\renewcommand{\arraystretch}{1.4}
+	%\expandafter\tabular\expandafter{\obicols}
+	\begin{tabular}{\expand\obicols}
+}{
+%	\endtabular
+	\end{tabular}
+	\caption{\figcaption}
+	\renewcommand{\arraystretch}{1}
+	\end{table}
+}
+
+\newcommand{\othead}[1]{
+	
+	\multicolumn{1}{c}{%\cellcolor{black}
+	{
+	\setlength{\tabcolsep}{0cm}
+	\hspace{-1em}
+	\setlength{\cellspacetoplimit}{0.7em}
+	\setlength{\cellspacebottomlimit}{0.7em}	
+	\begin{tabular}{@{}Sc@{}}
+		\textcolor{white}{\textbf{#1}}
+	\end{tabular}}}
+}
